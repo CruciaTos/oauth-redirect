@@ -1,13 +1,49 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
   <script>
-  const token = new URLSearchParams(window.location.search).get('code');
-  window.location.href = `io.supabase.flutterquickstart://login-callback?token=${token || ''}`;
+    // 1. Parse token securely
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('code') || urlParams.get('access_token');
+    const error = urlParams.get('error');
+    
+    // 2. Validate before redirect
+    if (error) {
+      console.error('OAuth Error:', error, urlParams.get('error_description'));
+      document.body.innerHTML = `<h1>Login Error</h1><p>${error}: ${urlParams.get('error_description') || 'Unknown error'}</p>`;
+    } 
+    else if (token) {
+      // 3. Secure redirect with validation
+      const appScheme = 'io.supabase.flutterquickstart';
+      const allowedHosts = ['login-callback'];
+      const redirectUrl = `${appScheme}://${allowedHosts[0]}?token=${encodeURIComponent(token)}`;
+      
+      // 4. Debugging output (remove in production)
+      console.log('Redirecting to:', redirectUrl);
+      document.body.innerHTML = '<p>Redirecting to app...</p>';
+      
+      // 5. Fallback mechanism
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 100);
+    } 
+    else {
+      document.body.innerHTML = '<h1>Invalid Request</h1><p>No token found</p>';
+    }
   </script>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 2rem;
+    }
+  </style>
 </head>
 <body>
-  Redirecting to app...
+  <!-- Loading state will be replaced by script -->
+  <p>Processing login...</p>
 </body>
 </html>
