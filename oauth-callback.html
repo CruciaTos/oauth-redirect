@@ -2,22 +2,44 @@
 <html>
 <head>
   <script>
-    // 1. Extract token from URL fragments (PKCE flow)
+    // 1. Handle both PKCE and implicit flows
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const token = hashParams.get('access_token') || new URLSearchParams(window.location.search).get('code');
+    const queryParams = new URLSearchParams(window.location.search);
     
-    // 2. Debug output
-    console.log('Token:', token);
+    // 2. Extract token from all possible locations
+    const token = hashParams.get('access_token') 
+                 || queryParams.get('code')
+                 || hashParams.get('code');
     
-    // 3. Redirect to app
+    // 3. Debug output (remove in production)
+    console.log('OAuth Response:', { 
+      hash: window.location.hash,
+      query: window.location.search,
+      token 
+    });
+
+    // 4. Redirect with fallback button
     if (token) {
-      window.location.href = `io.supabase.flutterquickstart://login-callback/?token=${encodeURIComponent(token)}`;
-    } else {
-      document.body.innerHTML = '<h1>Auth Failed</h1><p>No token received</p>';
+      const redirectUrl = `io.supabase.flutterquickstart://login-callback/?token=${encodeURIComponent(token)}`;
+      
+      // Try automatic redirect
+      window.location.href = redirectUrl;
+      
+      // Fallback button for mobile browsers
+      setTimeout(() => {
+        document.getElementById('manualRedirect').innerHTML = `
+          <button onclick="window.location.href='${redirectUrl}'" 
+                  style="padding: 12px; background: #4285F4; color: white; border: none; border-radius: 4px;">
+            Continue to App
+          </button>
+        `;
+      }, 1000);
     }
   </script>
 </head>
 <body>
-  <p>Completing login...</p>
+  <div id="manualRedirect">
+    <p>Completing login...</p>
+  </div>
 </body>
 </html>
