@@ -3,8 +3,8 @@
 <html>
 <head>
   <script>
-    const token = new URLSearchParams(window.location.search).get('code');
-    window.location.href = `io.supabase.flutterquickstart://login-callback?token=${token || ''}`;
+  const token = new URLSearchParams(window.location.search).get('code');
+  window.location.href = `io.supabase.flutterquickstart://login-callback?token=${token || ''}`;
   </script>
 </head>
 <body>
