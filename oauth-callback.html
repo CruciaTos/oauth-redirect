@@ -1,49 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting...</title>
   <script>
-    // 1. Parse token securely
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('code') || urlParams.get('access_token');
-    const error = urlParams.get('error');
+    // 1. Extract token from URL fragments (PKCE flow)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get('access_token') || new URLSearchParams(window.location.search).get('code');
     
-    // 2. Validate before redirect
-    if (error) {
-      console.error('OAuth Error:', error, urlParams.get('error_description'));
-      document.body.innerHTML = `<h1>Login Error</h1><p>${error}: ${urlParams.get('error_description') || 'Unknown error'}</p>`;
-    } 
-    else if (token) {
-      // 3. Secure redirect with validation
-      const appScheme = 'io.supabase.flutterquickstart';
-      const allowedHosts = ['login-callback'];
-      const redirectUrl = `${appScheme}://${allowedHosts[0]}?token=${encodeURIComponent(token)}`;
-      
-      // 4. Debugging output (remove in production)
-      console.log('Redirecting to:', redirectUrl);
-      document.body.innerHTML = '<p>Redirecting to app...</p>';
-      
-      // 5. Fallback mechanism
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 100);
-    } 
-    else {
-      document.body.innerHTML = '<h1>Invalid Request</h1><p>No token found</p>';
+    // 2. Debug output
+    console.log('Token:', token);
+    
+    // 3. Redirect to app
+    if (token) {
+      window.location.href = `io.supabase.flutterquickstart://login-callback/?token=${encodeURIComponent(token)}`;
+    } else {
+      document.body.innerHTML = '<h1>Auth Failed</h1><p>No token received</p>';
     }
   </script>
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      padding: 2rem;
-    }
-  </style>
 </head>
 <body>
-  <!-- Loading state will be replaced by script -->
-  <p>Processing login...</p>
+  <p>Completing login...</p>
 </body>
 </html>
